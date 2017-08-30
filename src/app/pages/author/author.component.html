@@ -1,0 +1,96 @@
+<div class="card">
+  <div class="card-block">
+      <div class="">
+          <button (click)="addNewForm()" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#responsive-modal" class="btn btn-success"><i class="mdi mdi-plus-circle"></i> Add new</button>
+      </div>
+      <div class="table-responsive m-t-40">
+          <table id="authorT" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+              <thead>
+                  <tr>
+                      <th>No.</th>
+                      <th>AuthorName</th>
+                      <th>City</th>
+                      <th>About</th>
+                      <th>Added on</th>
+                      <th>Manage</th>
+                  </tr>
+              </thead>
+              <tfoot>
+                  <tr>
+                      <th>No.</th>
+                      <th>AuthorName</th>
+                      <th>City</th>
+                      <th>About</th>
+                      <th>Added on</th>
+                      <th>Manage</th>
+                  </tr>
+              </tfoot>
+              <tbody>
+                  <tr *ngFor="let author of authors; let rowIndex = index">
+                      <td>{{rowIndex+1}}</td>
+                      <td>{{author.name}}</td>
+                      <td>{{author.city}}</td>
+                      <td>{{author.about}}</td>
+                      <td>{{author.created_at | date:"d MMM y"}}</td>
+                      <td>
+                          <button (click)=edit(author) data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#responsive-modal"  class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></button>
+                          <button (click)=delete(author,rowIndex) class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+<!-- Model -Edit -->
+<div id="responsive-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" (click)="close(model.set)" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <input id="hiddenclose" type="hidden" data-dismiss="modal" aria-hidden="true" />
+              <h4 *ngIf=model.set class="modal-title">Add Author Details</h4>
+              <h4 *ngIf=!model.set class="modal-title">Update Author Details</h4>
+          </div>
+          <form class="floating-labels" name="form" (ngSubmit)="f.form.valid && (model.set?addNew():editSubmit(model))" #f="ngForm" novalidate>
+          <div class="modal-body">
+              <div class="row m-t-20">
+                <div class="col-md-12">
+                  <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !authorname.valid }">
+                      <input id="authorname" type="text" class="form-control" name="authorname" [(ngModel)]="model.name" #authorname="ngModel" required />
+                      <span class="bar"></span>
+                      <label for="authorname">author name</label>
+                      <div *ngIf="f.submitted && !authorname.valid" class="help-block">Name is required</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row m-t-20">
+                <div class="col-md-12">
+                  <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !city.valid }">
+                      <input id="city" type="text" class="form-control" name="city" [(ngModel)]="model.city" #city="ngModel" required />
+                      <span class="bar"></span>
+                      <label for="city">Author City</label>
+                      <div *ngIf="f.submitted && !city.valid" class="help-block">City is required</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row m-t-20">
+                <div class="col-md-12">
+                  <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !about.valid }">
+                      <textarea id="about" type="text" class="form-control" name="about" [(ngModel)]="model.about" #about="ngModel" required ></textarea>
+                      <span class="bar"></span>
+                      <label for="auabout">Author Description</label>
+                      <div *ngIf="f.submitted && !about.valid" class="help-block">Author description is required</div>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+                  <button *ngIf=model.set  [disabled]="f.submitted && loading" type="submit" class="btn btn-danger waves-effect waves-light">Add</button>
+                  <button *ngIf=!model.set  [disabled]="f.submitted && loading" type="submit" class="btn btn-danger waves-effect waves-light">Save changes</button>
+              <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+          </div>
+          </form>
+      </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="card">
+    <div class="card-block">
+        <div class="">
+            <a routerLink="/home/addbook" class="btn btn-success"><i class="mdi mdi-plus-circle"></i> Add new</a>
+        </div>
+        <div class="table-responsive m-t-40">
+            <table id="allBookT" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>BookName</th>
+                        <th>Cover</th>
+                        <th>Author</th>
+                        <th>Price</th>
+                        <th>Rate Books</th>
+                        <th>Added By</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>No.</th>
+                        <th>BookName</th>
+                        <th>Cover</th>
+                        <th>Author</th>
+                        <th>Price</th>
+                        <th>Rate Books</th>
+                        <th>Added By</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <tr *ngFor="let book of books; let rowIndex = index">
+                        <td>{{rowIndex+1}}</td>
+                        <td>{{book.name}}</td>
+                        <td><img class="img img-sm img-thumbnail" src={{book.cover}} /></td>
+                        <td>{{book.author_name}}</td>
+                        <td>{{book.price}}</td>
+                        <td><rating [(ngModel)]=book.rate (click)=rateit(book) [disabled]="book.user_id == user.id ? true : false" [float]=true ></rating></td>
+                        <td>{{book.user_name}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Model -->
+<div id="responsive-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" (click)="close()" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <input id="hiddenclose" type="hidden" data-dismiss="modal" aria-hidden="true" />
+                <h4 class="modal-title">Update Book Details</h4>
+            </div>
+            <form class="floating-labels" name="form" (ngSubmit)="f.form.valid && editSubmit(model)" #f="ngForm" novalidate>
+            <div class="modal-body">
+                    <div class="row m-t-20">
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !bookname.valid }">
+                                <input id="bookname" type="text" class="form-control" name="bookname" [(ngModel)]="model.name" #bookname="ngModel" required />
+                                <span class="bar"></span>
+                                <label for="bookname">Book name</label>
+                                <div *ngIf="f.submitted && !bookname.valid" class="help-block">Bookname is required</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !author.valid }">
+                                <input id="author" type="text" class="form-control" name="author" [(ngModel)]="model.author" #author="ngModel" required />
+                                <span class="bar"></span>
+                                <label for="author">Author name</label>
+                                <div *ngIf="f.submitted && !author.valid" class="help-block">Author is required</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-t-20">
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !price.valid }">
+                                <input id="price" type="number" class="form-control" name="price" [(ngModel)]="model.price" #price="ngModel" required />
+                                <span class="bar"></span>
+                                <label for="price">Price for a Product (<i class="fa fa-inr"></i>)</label>
+                                <div *ngIf="f.submitted && !price.valid" class="help-block">Price is required</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !qty.valid }">
+                                <input pattern="\d{1,6}" min="1" max="999999" maxlength="999999" id="qty" type="number" class="form-control" name="qty" [(ngModel)]="model.qty" #qty="ngModel" required />
+                                <span class="bar"></span>
+                                <label for="qty">Quantity</label>
+                                <div *ngIf="f.submitted && qty.hasError('required')" class="help-block">Quantity is required</div>
+                                <div *ngIf="f.submitted && qty.hasError('pattern')" class="help-block">No a valid quantity</div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                <button [disabled]="loading || !f.valid" type="submit" class="btn btn-danger waves-effect waves-light">Save changes</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

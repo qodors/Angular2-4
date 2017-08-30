@@ -1,0 +1,6 @@
+.has-error{
+    border-color: #f00;
+}
+.has-error .help-block{
+    color: #f00;
+}

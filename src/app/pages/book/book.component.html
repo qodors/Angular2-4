@@ -1,0 +1,176 @@
+<div class="card">
+    <div class="card-block">
+        <div class="">
+            <a routerLink="/home/addbook" class="btn btn-success"><i class="mdi mdi-plus-circle"></i> Add new</a>
+        </div>
+        <div class="table-responsive m-t-40">
+            <table id="bookT" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>BookName</th>
+                        <th>Cover</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Rates</th>
+                        <th>Added on</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>No.</th>
+                        <th>BookName</th>
+                        <th>Cover</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Rates</th>
+                        <th>Added on</th>
+                        <th>Manage</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <tr *ngFor="let book of books; let rowIndex = index">
+                        <td>{{rowIndex+1}}</td>
+                        <td>{{book.name}}</td>
+                        <td><img class="img img-thumbnail" src={{book.cover}} /></td>
+                        <td>{{book.author_name}}</td>
+                        <td>{{book.category_name}}</td>
+                        <td>{{book.price}}</td>
+                        <td>{{book.qty}}</td>
+                        <td>
+                            <rating [(ngModel)]=book.rate [readonly]="true"></rating>
+                        </td>
+                        <td>{{book.created_at | date:"d MMM y"}}</td>
+                        <td>
+                            <button (click)=edit(book) data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#responsive-modal"
+                                class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></button>
+                            <button (click)=delete(book) class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                            <a target="_blank" [href]="book.pdf" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Model -->
+<div id="responsive-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+    style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" (click)="close()" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <input id="hiddenclose" type="hidden" data-dismiss="modal" aria-hidden="true" />
+                <h4 class="modal-title">Update Book Details</h4>
+            </div>
+            <form class="floating-labels" name="form" (ngSubmit)="f.form.valid && editSubmit($event,model)" #f="ngForm" novalidate>
+                <div class="modal-body">
+                    <div class="row m-t-20">
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !bookname.valid }">
+                                <input id="bookname" type="text" class="form-control" name="bookname" [(ngModel)]="model.name" #bookname="ngModel" required
+                                />
+                                <span class="bar"></span>
+                                <label for="bookname">Book name</label>
+                                <div *ngIf="f.submitted && !bookname.valid" class="help-block">Bookname is required</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !author.valid }">
+                                <select id="author" (change)="setName($event.target.options[$event.target.selectedIndex].text)" class="form-control" name="author_id"
+                                    [(ngModel)]="model.author_id" #author="ngModel" required>
+                                    <option *ngFor="let author of authors" [value]="author.id">{{author.name}}</option>
+                                </select>
+                                <span class="bar"></span>
+                                <label for="author">Author</label>
+                                <div *ngIf="f.submitted && !author.valid" class="help-block">Select Author for this book</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-t-20">
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !price.valid }">
+                                <input id="price" type="number" class="form-control" name="price" [(ngModel)]="model.price" #price="ngModel" required />
+                                <span class="bar"></span>
+                                <label for="price">Price for a Product (<i class="fa fa-inr"></i>)</label>
+                                <div *ngIf="f.submitted && !price.valid" class="help-block">Not a valid Price</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !qty.valid }">
+                                <input pattern="\d{1,6}" min="1" max="999999" maxlength="999999" id="qty" type="number" class="form-control" name="qty" [(ngModel)]="model.qty"
+                                    #qty="ngModel" required />
+                                <span class="bar"></span>
+                                <label for="qty">Quantity</label>
+                                <div *ngIf="f.submitted && qty.hasError('required')" class="help-block">Quantity is required</div>
+                                <div *ngIf="f.submitted && qty.hasError('pattern')" class="help-block">Not a valid quantity</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-t-20">
+                        <div class="col-md-6">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !category.valid }">
+                                <select id="category" (change)="setName($event.target.options[$event.target.selectedIndex].text)" class="form-control" name="category_id"
+                                    [(ngModel)]="model.category_id" #category="ngModel" required>
+                                    <option *ngFor="let category of categories" [value]="category.id">{{category.name}}</option>
+                                </select>
+                                <span class="bar"></span>
+                                <label for="category">Category</label>
+                                <div *ngIf="f.submitted && !category.valid" class="help-block">Select Category for this book</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-t-20">
+                        <div class="col-md-12">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && invalid || invalid }">
+                                <div class="preview">
+                                    <div class="img justify">
+                                        <img *ngIf=model.cover [src]="model.cover" />
+                                    </div>
+                                    <label class="img-cover justify" for="cover">
+                                        <div>
+                                            <div><i class="fa fa-plus-circle"></i></div>
+                                            <div><span>Book Cover</span></div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <input accept="image/*" type="file" id="cover" (change)="Validate($event)" name="cover" />
+                                <div *ngIf="f.submitted && invalid || invalid" class="help-block">Cover image must be any one of type .jpg, .jpeg or .png</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-t-20">
+                        <div class="col-md-12">
+                            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && invalidpdf || invalidpdf }">
+                                <label style="top: -30px;" for="pdf">File upload</label>
+                                <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                    <div class="form-control" data-trigger="fileinput">
+                                        <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                                        <span class="fileinput-filename">{{model.pdf}}</span>
+                                    </div>
+                                    <span class="input-group-addon btn btn-default btn-file"> 
+                                        <span class="fileinput-new">Select file</span>
+                                        <span class="fileinput-exists">Change</span>
+                                        <input required id="pdf" accept="application/pdf" type="file" name="pdf" (change)="ValidatePdf($event)">
+                                    </span>
+                                    <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                                </div>
+                                <div *ngIf="invalidpdf" class="help-block">Select Pdf file only</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="f.invalid || loading || f.submitted && invalid || invalid || invalidpdf" type="submit" class="btn btn-danger waves-effect waves-light">Save changes</button>
+                    <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA=="
+                    />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

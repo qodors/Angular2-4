@@ -1,0 +1,7 @@
+.close{
+    background: #f00;
+    padding: 0px 5px;
+    color: #fff;
+    font-weight: 400;
+    border-radius: 50%;
+}

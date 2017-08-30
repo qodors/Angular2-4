@@ -1,0 +1,50 @@
+.dt-buttons .dt-button{
+    position: relative !important;
+}
+td .img{
+    width: 80px;
+}
+.preview{
+    position: relative;
+    height: 255px;
+    border: 1px solid #d9d9d9;
+    overflow: hidden;
+}
+.justify{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+.preview .img img{
+    height: 100%;
+}
+#cover{
+    visibility: hidden;
+    height: 0;
+    width: 0;
+}
+.img-cover{
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.29);
+    color: #fff;
+    font-size: 30px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.img-cover i {
+    font-size: 65px;
+}
+.close{
+    background: #f00;
+    padding: 0px 5px;
+    color: #fff;
+    font-weight: 400;
+    border-radius: 50%;
+}
