@@ -3,6 +3,12 @@
 Here is a Basic Demo for Angular2/4 with Laravel5.2 Service for Book management.
 We also tried to incorporate all basic requirement like Bootstrap Material Admin panal, Bootstrap modal, Datatables, Charts, Alerts etc.
 
+# Technical Terms
+
+This project is generated with angular-cli version 1.0.4
+
+It also includes angular 4 features like Selectors, Controllers, Dependency Injection, Template Integration, Expression, Directives, Components, Routers, Input/Output Properties, Json Parsing using components, and most important Typescript and Unit Testing.
+
 # Requirements
   - Angular v2+
   - angular-cli for angular2/4
