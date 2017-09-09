@@ -1,6 +1,6 @@
 # Angular2/4 Demo
 
-Here is a Basic Demo for Angular2/4 with Laravel5.2 Service for Book management.
+Here is a Source code for Angular2/4 with Laravel5.2 Service for Book management.
 We also tried to incorporate all basic requirement like Bootstrap Material Admin panal, Bootstrap modal, Datatables, Charts, Alerts etc.
 
 # Technical Terms
